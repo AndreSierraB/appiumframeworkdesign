@@ -55,8 +55,9 @@ public class FormPage extends AndroidActions{
         driver.findElement(By.xpath("//android.widget.TextView[@text='"+countryName+"']")).click();
     }
 
-    public void submitForm(){
+    public ProductCatalog submitForm() throws InterruptedException{
         shopButton.click();
+        return new ProductCatalog(driver);
     }
 
 }

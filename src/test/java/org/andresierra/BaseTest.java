@@ -10,21 +10,18 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.time.Duration;
 
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
+import org.andresierra.pageObjects.android.FormPage;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-
-import com.google.common.collect.ImmutableMap;
 
 public class BaseTest {
 
     public AndroidDriver driver;
     public AppiumDriverLocalService service;
+    public FormPage formPage;
     
     @BeforeClass
-    public void ConfigureAppium() throws URISyntaxException, MalformedURLException{
+    public void ConfigureAppium() throws URISyntaxException, MalformedURLException, InterruptedException{
         // Start Appium server with increased startup timeout
         service = new AppiumServiceBuilder()
         .withAppiumJS(new File("/Users/andreasierra/.nvm/versions/node/v22.14.0/lib/node_modules/appium/build/lib/main.js"))
@@ -46,42 +43,9 @@ public class BaseTest {
         //Android driver
         //Appium code -> Appium server --> Mobile
         driver = new AndroidDriver(new URI("http://127.0.0.1:4723").toURL(), options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        formPage = new FormPage(driver);
     }
-
-    public void longPressAction(WebElement ele){
-        //Long press action
-        ((JavascriptExecutor)driver).executeScript("mobile: longClickGesture", 
-            ImmutableMap.of("elementId", ((RemoteWebElement)ele).getId(), "duration", 2000));
-    }
-
-    public void scrollToEndAction(){
-        //Scroll to end
-        boolean canScrollMore;
-        do{
-        canScrollMore = (Boolean) ((JavascriptExecutor) driver).executeScript("mobile: scrollGesture", ImmutableMap.of(
-            "left", 100, "top", 100, "width", 200, "height", 200,
-            "direction", "down",
-            "percent", 3.0
-        ));}
-        while(canScrollMore);
-    }
-
-    public void swipeAction(WebElement ele, String direction){
-        //Swipe action
-        ((JavascriptExecutor) driver).executeScript("mobile: swipeGesture", ImmutableMap.of(
-            "elementId", ((RemoteWebElement)ele).getId(),
-            "direction", direction,
-            "percent", 0.25
-        ));
-    }
-
-    public Double getFormattedAmount(String amount)
-	{
-		Double price = Double.parseDouble(amount.substring(1));
-		return price;
-		
-	}
 
     @AfterClass
     public void StopAppium(){
